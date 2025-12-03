@@ -12,7 +12,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Environment variables
 SECRET_KEY = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
 DEBUG = os.environ.get('DEBUG', '1') == '1'
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+ALLOWED_HOSTS = ['*']  # Allow all hosts
+
 
 # ---------------------- APPS ----------------------
 INSTALLED_APPS = [
@@ -144,8 +145,7 @@ if not DEBUG:
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 
 # ---------------------- CORS ----------------------
-CORS_ALLOW_ALL_ORIGINS = False
-CORS_ALLOWED_ORIGINS = os.environ.get('CORS_ALLOWED_ORIGINS', 'http://localhost:3000,http://localhost:8000').split(',')
+CORS_ALLOW_ALL_ORIGINS = True  # Allow all origins for development/testing
 CORS_ALLOW_CREDENTIALS = True
 
 
