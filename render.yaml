@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: todo-app
+    env: python
+    region: oregon
+    plan: free
+    buildCommand: pip install -r requirements.txt && python manage.py migrate && python manage.py collectstatic --noinput
+    startCommand: gunicorn todo.wsgi:application --bind 0.0.0.0:$PORT
+    envVars:
+      - key: SECRET_KEY
+        scope: build
+      - key: DEBUG
+        value: "0"
+      - key: ALLOWED_HOSTS
+        scope: build
+      - key: GROQ_API_KEY
+        scope: build
+      - key: DATABASE_URL
+        scope: build
