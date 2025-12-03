@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 500px;
+            padding: 30px;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+
+        .auth-section {
+            display: none;
+            margin-bottom: 30px;
+        }
+
+        .auth-section.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            color: #555;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="datetime-local"],
+        textarea {
+            width: 100%;
+            padding: 10px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="password"]:focus,
+        input[type="datetime-local"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .toggle-auth {
+            text-align: center;
+            margin-top: 15px;
+            color: #666;
+        }
+
+        .toggle-auth a {
+            color: #667eea;
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .toggle-auth a:hover {
+            text-decoration: underline;
+        }
+
+        .app-section {
+            display: none;
+        }
+
+        .app-section.active {
+            display: block;
+        }
+
+        .logout-btn {
+            background: #ff6b6b;
+            margin-bottom: 20px;
+        }
+
+        .logout-btn:hover {
+            box-shadow: 0 10px 20px rgba(255, 107, 107, 0.3);
+        }
+
+        .check-deadline-btn {
+            background: #4caf50;
+            margin-left: 10px;
+            margin-bottom: 20px;
+            width: auto;
+            padding: 12px 20px;
+        }
+
+        .check-deadline-btn:hover {
+            box-shadow: 0 10px 20px rgba(76, 175, 80, 0.3);
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .input-group input {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        .input-group button {
+            flex: 0 0 auto;
+            width: auto;
+            padding: 10px 20px;
+        }
+
+        .tasks-list {
+            list-style: none;
+        }
+
+        .task-item {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .task-item:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .task-item.completed {
+            opacity: 0.6;
+            background: #e8f5e9;
+            border-left-color: #4caf50;
+        }
+
+        .task-item.completed .task-text {
+            text-decoration: line-through;
+            color: #999;
+        }
+
+        .task-content {
+            flex: 1;
+        }
+
+        .task-text {
+            color: #333;
+            font-size: 1.1em;
+            margin-bottom: 5px;
+        }
+
+        .task-date {
+            color: #999;
+            font-size: 0.9em;
+        }
+
+        .task-deadline {
+            color: #ff6b6b;
+            font-size: 0.9em;
+            font-weight: 600;
+            margin-top: 5px;
+        }
+
+        .task-item.overdue {
+            background: #ffe5e5;
+            border-left-color: #ff6b6b;
+        }
+
+        .task-item.overdue .task-deadline {
+            color: #c62828;
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 8px;
+            margin-left: 10px;
+        }
+
+        .task-actions button {
+            width: auto;
+            padding: 8px 12px;
+            font-size: 0.9em;
+            margin: 0;
+        }
+
+        .btn-complete {
+            background: #4caf50;
+        }
+
+        .btn-delete {
+            background: #ff6b6b;
+        }
+
+        .btn-complete:hover {
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .btn-delete:hover {
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+
+        .empty-state svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .error.active {
+            display: block;
+        }
+
+        .success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .success.active {
+            display: block;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .ai-panel {
+            background: #f0f4ff;
+            border: 2px solid #667eea;
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 30px;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+        }
+
+        .ai-panel h3 {
+            color: #667eea;
+            margin-bottom: 12px;
+            font-size: 1.1em;
+            font-weight: 700;
+        }
+
+        .ai-chat {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 280px;
+            overflow-y: auto;
+            margin-bottom: 12px;
+            padding: 12px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .ai-message {
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-size: 0.95em;
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+
+        .ai-message.user {
+            background: #667eea;
+            color: white;
+            text-align: right;
+            margin-left: 30px;
+            border-bottom-right-radius: 2px;
+        }
+
+        .ai-message.assistant {
+            background: #e8f0ff;
+            color: #333;
+            text-align: left;
+            margin-right: 30px;
+            border-bottom-left-radius: 2px;
+            border: 1px solid #d0dff7;
+        }
+
+        .ai-input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .ai-input-group input {
+            flex: 1;
+            margin-bottom: 0;
+            padding: 10px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 0.9em;
+        }
+
+        .ai-input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .ai-input-group button {
+            flex: 0 0 auto;
+            width: auto;
+            padding: 10px 20px;
+            font-size: 0.9em;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .ai-input-group button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .ai-input-group button:active {
+            transform: translateY(0);
+        }
+
+            .tabs {
+                display: flex;
+                gap: 5px;
+                margin-bottom: 20px;
+                border-bottom: 2px solid #e0e0e0;
+            }
+
+            .tab-btn {
+                padding: 10px 20px;
+                background: #f0f0f0;
+                border: none;
+                border-radius: 8px 8px 0 0;
+                cursor: pointer;
+                font-weight: 600;
+                color: #666;
+                transition: all 0.3s;
+            }
+
+            .tab-btn.active {
+                background: #667eea;
+                color: white;
+                border-bottom: 3px solid #764ba2;
+            }
+
+            .tab-btn:hover {
+                background: #ddd;
+            }
+
+            .tab-btn.active:hover {
+                background: #667eea;
+            }
+
+            .restore-btn {
+                background: #4caf50;
+                color: white;
+                border: none;
+                padding: 6px 12px;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 0.8em;
+                margin-left: 8px;
+            }
+
+            .restore-btn:hover {
+                background: #45a049;
+            }
+        </style>
+    </head>
+<body>
+    <div class="container">
+        <!-- Auth Sections -->
+        <div id="authContainer">
+            <!-- Login Section -->
+            <div id="loginSection" class="auth-section active">
+                <h1>Welcome Back</h1>
+                <div class="error" id="loginError"></div>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="loginEmail">Email</label>
+                        <input type="email" id="loginEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" required>
+                    </div>
+                    <button type="submit">Login</button>
+                </form>
+                <div class="toggle-auth">
+                    Don't have an account? <a onclick="toggleAuth()">Sign up</a>
+                </div>
+            </div>
+
+            <!-- Register Section -->
+            <div id="registerSection" class="auth-section">
+                <h1>Create Account</h1>
+                <div class="error" id="registerError"></div>
+                <form id="registerForm">
+                    <div class="form-group">
+                        <label for="registerUsername">Username</label>
+                        <input type="text" id="registerUsername" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerEmail">Email</label>
+                        <input type="email" id="registerEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerPassword">Password</label>
+                        <input type="password" id="registerPassword" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerPassword2">Confirm Password</label>
+                        <input type="password" id="registerPassword2" required>
+                    </div>
+                    <button type="submit">Sign Up</button>
+                </form>
+                <div class="toggle-auth">
+                    Already have an account? <a onclick="toggleAuth()">Login</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- App Section -->
+        <div id="appContainer" class="app-section">
+            <h1>My Tasks</h1>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+            <button class="check-deadline-btn" onclick="checkDeadlines()">Check Deadlines</button>
+            
+            <div class="error" id="appError"></div>
+            <div class="success" id="appSuccess"></div>
+
+            <div style="display:flex;gap:10px;margin-bottom:10px;align-items:center;">
+                <div style="flex:1;">
+                    <input type="text" id="taskInput" placeholder="Add a new task...">
+                </div>
+                <div style="width:140px;">
+                    <select id="priorityInput" style="width:100%;padding:10px;border-radius:8px;border:2px solid #e0e0e0;">
+                        <option value="2">Medium</option>
+                        <option value="3">High</option>
+                        <option value="1">Low</option>
+                    </select>
+                </div>
+                <div style="width:196px;">
+                    <input type="datetime-local" id="deadlineInput" title="Set deadline (optional)" style="width:100%;">
+                </div>
+                <div style="width:80px;">
+                    <button onclick="addTask()">Add</button>
+                </div>
+            </div>
+
+            <div style="display:flex;gap:10px;margin-bottom:20px;align-items:center;">
+                <label style="color:#666;font-weight:600;">Filter:</label>
+                <select id="filterPriority" style="padding:8px;border-radius:8px;border:2px solid #e0e0e0;">
+                    <option value="">All</option>
+                    <option value="3">High</option>
+                    <option value="2">Medium</option>
+                    <option value="1">Low</option>
+                </select>
+                <label style="color:#666;font-weight:600;">Sort:</label>
+                <select id="sortBy" style="padding:8px;border-radius:8px;border:2px solid #e0e0e0;">
+                    <option value="-created_at">Newest</option>
+                    <option value="created_at">Oldest</option>
+                    <option value="-priority">Priority (High → Low)</option>
+                    <option value="priority">Priority (Low → High)</option>
+                </select>
+                <button style="width:auto;padding:8px 12px;" onclick="applyFilters()">Apply</button>
+            </div>
+
+            <!-- Tabs for Active / Completed / Deleted -->
+            <div class="tabs" id="statusTabs">
+                <button class="tab-btn active" id="tab-active" onclick="switchTab('active')">Active</button>
+                <button class="tab-btn" id="tab-completed" onclick="switchTab('completed')">Completed</button>
+                <button class="tab-btn" id="tab-deleted" onclick="switchTab('deleted')">Deleted</button>
+            </div>
+
+            <ul id="tasksList" class="tasks-list"></ul>
+
+            <div id="emptyState" class="empty-state">
+                <p>No tasks yet. Create one to get started!</p>
+            </div>
+
+            <div class="ai-panel">
+                <h3>🤖 AI Assistant</h3>
+                <div id="aiChat" class="ai-chat"></div>
+                <div class="ai-input-group">
+                    <input type="text" id="aiInput" placeholder="Ask me anything..." />
+                    <button onclick="sendAIMessage()">Ask</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api/tasks';
+        let token = localStorage.getItem('access_token');
+        let currentStatus = 'active'; // active | completed | deleted
+
+        console.log('Todo frontend loaded');
+
+        // UI helpers
+        function toggleAuth() {
+            document.getElementById('loginSection').classList.toggle('active');
+            document.getElementById('registerSection').classList.toggle('active');
+            clearErrors();
+        }
+
+        function showAuth() {
+            document.getElementById('authContainer').style.display = 'block';
+            document.getElementById('appContainer').classList.remove('active');
+        }
+
+        function showApp() {
+            document.getElementById('authContainer').style.display = 'none';
+            document.getElementById('appContainer').classList.add('active');
+        }
+
+        function clearErrors() {
+            ['loginError','registerError','appError'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = '';
+            });
+        }
+
+        function showError(message, section = 'app') {
+            const errorEl = document.getElementById(section + 'Error');
+            if (errorEl) {
+                errorEl.textContent = message;
+                errorEl.classList.add('active');
+                setTimeout(() => errorEl.classList.remove('active'), 5000);
+            }
+            console.error('UI Error:', section, message);
+        }
+
+        function showSuccess(message) {
+            const successEl = document.getElementById('appSuccess');
+            if (successEl) {
+                successEl.textContent = message;
+                successEl.classList.add('active');
+                setTimeout(() => successEl.classList.remove('active'), 3000);
+            }
+        }
+
+        // Initialize view
+        if (token) {
+            showApp();
+            loadTasks();
+        } else {
+            showAuth();
+        }
+
+        // LOGIN
+        const loginForm = document.getElementById('loginForm');
+        if (loginForm) {
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = document.getElementById('loginEmail').value;
+                const password = document.getElementById('loginPassword').value;
+
+                try {
+                    const response = await fetch('/api/users/login/', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, password })
+                    });
+
+                    let data = null;
+                    try { data = await response.json(); } catch (err) { console.warn('Login parse error', err); }
+
+                    if (!response.ok) {
+                        const msg = (data && (data.detail || Object.values(data)[0])) || `Login failed (${response.status})`;
+                        throw new Error(msg);
+                    }
+
+                    if (!data || !data.access) throw new Error('Invalid login response');
+
+                    localStorage.setItem('access_token', data.access);
+                    localStorage.setItem('refresh_token', data.refresh);
+                    token = data.access;
+
+                    showApp();
+                    loadTasks();
+                    loginForm.reset();
+                } catch (error) {
+                    showError(error.message, 'login');
+                }
+            });
+        } else console.warn('loginForm not found');
+
+        // REGISTER
+        const registerForm = document.getElementById('registerForm');
+        if (registerForm) {
+            registerForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const username = document.getElementById('registerUsername').value;
+                const email = document.getElementById('registerEmail').value;
+                const password = document.getElementById('registerPassword').value;
+                const password2 = document.getElementById('registerPassword2').value;
+
+                if (password !== password2) {
+                    showError('Passwords do not match', 'register');
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/api/users/register/', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username, email, password, password2 })
+                    });
+
+                    if (!response.ok) {
+                        const data = await response.json();
+                        throw new Error(Object.values(data)[0] || 'Registration failed');
+                    }
+
+                    showSuccess('Account created! Now login.');
+                    setTimeout(() => toggleAuth(), 1200);
+                    registerForm.reset();
+                } catch (error) {
+                    showError(error.message, 'register');
+                }
+            });
+        }
+
+        // LOAD TASKS
+        async function loadTasks() {
+            try {
+                const filterPriority = document.getElementById('filterPriority')?.value;
+                const sortBy = document.getElementById('sortBy')?.value;
+
+                const params = new URLSearchParams();
+                if (filterPriority) params.append('priority', filterPriority);
+                if (sortBy) params.append('ordering', sortBy);
+            if (currentStatus) params.append('status', currentStatus);
+
+                const url = API_BASE + '/?' + params.toString();
+
+                const response = await fetch(url, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) throw new Error('Failed to load tasks');
+
+                const data = await response.json();
+                let tasks = [];
+                if (Array.isArray(data)) tasks = data;
+                else if (data && Array.isArray(data.results)) tasks = data.results;
+                else if (data && data.results) tasks = data.results || [];
+
+                displayTasks(tasks);
+            } catch (error) {
+                showError(error.message);
+            }
+        }
+
+        // DISPLAY TASKS
+        function displayTasks(tasks) {
+            const list = document.getElementById('tasksList');
+            const emptyState = document.getElementById('emptyState');
+
+            if (!Array.isArray(tasks) || tasks.length === 0) {
+                list.innerHTML = '';
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            emptyState.style.display = 'none';
+            const priorityLabel = (p) => {
+                if (p === 3) return '<span style="background:#ff6b6b;color:#fff;padding:4px 8px;border-radius:12px;font-size:0.8em;margin-right:8px;">High</span>';
+                if (p === 2) return '<span style="background:#ffb74d;color:#fff;padding:4px 8px;border-radius:12px;font-size:0.8em;margin-right:8px;">Medium</span>';
+                return '<span style="background:#90caf9;color:#fff;padding:4px 8px;border-radius:12px;font-size:0.8em;margin-right:8px;">Low</span>';
+            };
+
+            list.innerHTML = tasks.map(task => {
+                const deadlineDate = task.deadline ? new Date(task.deadline) : null;
+                const now = new Date();
+                let deadlineText = '';
+                let isOverdue = false;
+
+                if (deadlineDate) {
+                    const diff = deadlineDate - now;
+                    if (diff < 0) {
+                        isOverdue = true;
+                        deadlineText = '⚠️ OVERDUE';
+                    } else {
+                        const hours = Math.floor(diff / 3600000);
+                        const minutes = Math.floor((diff % 3600000) / 60000);
+                        if (hours < 1) deadlineText = `⏰ ${minutes}m left`;
+                        else if (hours < 24) deadlineText = `⏰ ${hours}h ${minutes}m left`;
+                        else {
+                            const days = Math.floor(hours / 24);
+                            deadlineText = `📅 ${days}d left`;
+                        }
+                    }
+                }
+
+                // Build actions depending on status
+                let actions = '';
+                if (!task.status || task.status === 'active') {
+                    actions = `
+                        <button class="btn-complete" onclick="toggleTask(${task.id}, ${!task.is_completed})">
+                            ${task.is_completed ? 'Undo' : 'Done'}
+                        </button>
+                        <button class="btn-delete" onclick="deleteTask(${task.id})">Delete</button>
+                    `;
+                } else {
+                    // archived (completed) or deleted
+                    actions = `
+                        <button class="restore-btn" onclick="restoreTask(${task.id})">Restore</button>
+                        <button class="btn-delete" onclick="deleteTask(${task.id})">Delete</button>
+                    `;
+                }
+
+                return `
+                <li class="task-item ${task.is_completed ? 'completed' : ''} ${isOverdue ? 'overdue' : ''}">
+                    <div class="task-content">
+                        <div class="task-text">${priorityLabel(task.priority)} ${escapeHtml(task.title)}</div>
+                        <div class="task-date">${new Date(task.created_at).toLocaleDateString()}</div>
+                        ${deadlineText ? `<div class="task-deadline">${deadlineText}</div>` : ''}
+                    </div>
+                    <div class="task-actions">
+                        ${actions}
+                    </div>
+                </li>
+            `}).join('');
+        }
+
+        // ADD TASK
+        async function addTask() {
+            const input = document.getElementById('taskInput');
+            const deadlineInput = document.getElementById('deadlineInput');
+            const priorityInput = document.getElementById('priorityInput');
+            const title = input.value.trim();
+            const deadline = deadlineInput.value;
+            const priority = priorityInput?.value;
+
+            if (!title) {
+                showError('Please enter a task');
+                return;
+            }
+
+            try {
+                const body = { title };
+                if (deadline) body.deadline = new Date(deadline).toISOString();
+                if (priority) body.priority = parseInt(priority, 10);
+
+                const response = await fetch(API_BASE + '/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(body)
+                });
+
+                if (!response.ok) throw new Error('Failed to add task');
+
+                input.value = '';
+                deadlineInput.value = '';
+                if (priorityInput) priorityInput.value = '2';
+                showSuccess('Task added!');
+                loadTasks();
+            } catch (error) {
+                showError(error.message);
+            }
+        }
+
+        // TOGGLE TASK
+        async function toggleTask(id, isCompleted) {
+            try {
+                // When marking completed, also set status to 'completed'. When undoing, set status back to 'active'
+                const body = { is_completed: isCompleted };
+                if (isCompleted) body.status = 'completed';
+                else body.status = 'active';
+
+                const response = await fetch(API_BASE + `/${id}/`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(body)
+                });
+
+                if (!response.ok) throw new Error('Failed to update task');
+                loadTasks();
+            } catch (error) {
+                showError(error.message);
+            }
+        }
+
+        // DELETE TASK
+        async function deleteTask(id) {
+            if (!confirm('Are you sure?')) return;
+
+            try {
+                const response = await fetch(API_BASE + `/${id}/`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) throw new Error('Failed to delete task');
+
+                showSuccess('Task deleted!');
+                loadTasks();
+            } catch (error) {
+                showError(error.message);
+            }
+        }
+
+        // SWITCH TAB (active/completed/deleted)
+        function switchTab(status) {
+            currentStatus = status;
+            ['active','completed','deleted'].forEach(s => {
+                const btn = document.getElementById('tab-' + s);
+                if (!btn) return;
+                if (s === status) btn.classList.add('active');
+                else btn.classList.remove('active');
+            });
+            loadTasks();
+        }
+
+        // RESTORE TASK
+        async function restoreTask(id) {
+            try {
+                const response = await fetch(API_BASE + `/${id}/restore/`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
+                });
+
+                if (!response.ok) {
+                    const data = await response.json().catch(() => ({}));
+                    throw new Error(data.detail || 'Failed to restore task');
+                }
+
+                showSuccess('Task restored');
+                loadTasks();
+            } catch (error) {
+                showError(error.message);
+            }
+        }
+
+        // LOGOUT
+        function logout() {
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('refresh_token');
+            token = null;
+            showAuth();
+            document.getElementById('loginForm')?.reset();
+            document.getElementById('registerForm')?.reset();
+            clearErrors();
+        }
+
+        // CHECK DEADLINES
+        async function checkDeadlines() {
+            try {
+                const response = await fetch('/api/tasks/check-deadlines/', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) throw new Error('Failed to check deadlines');
+
+                const data = await response.json();
+                showSuccess(data.message || 'Deadline check completed! Check your email.');
+            } catch (error) {
+                showError(error.message);
+            }
+        }
+
+        // ESCAPE HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Enter key to add task
+        document.getElementById('taskInput')?.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') addTask();
+        });
+
+        // Apply filter/sort controls
+        function applyFilters() {
+            loadTasks();
+            showSuccess('Filters applied');
+        }
+
+        // AI CHAT
+        async function sendAIMessage() {
+            const input = document.getElementById('aiInput');
+            const question = input.value.trim();
+            const chatDiv = document.getElementById('aiChat');
+
+            if (!question) return;
+
+            // Add user message
+            const userMsg = document.createElement('div');
+            userMsg.className = 'ai-message user';
+            userMsg.textContent = question;
+            chatDiv.appendChild(userMsg);
+            input.value = '';
+            chatDiv.scrollTop = chatDiv.scrollHeight;
+
+            try {
+                const response = await fetch(`/api/ai/ask/?q=${encodeURIComponent(question)}`);
+                
+                let data = null;
+                const contentType = response.headers.get('content-type');
+                
+                // Check if response is JSON
+                if (contentType && contentType.includes('application/json')) {
+                    data = await response.json();
+                } else {
+                    const text = await response.text();
+                    console.error('Non-JSON response:', text);
+                    throw new Error('Server returned HTML instead of JSON (possible server error)');
+                }
+                
+                if (!response.ok) {
+                    throw new Error(data?.error || `HTTP ${response.status}: AI request failed`);
+                }
+
+                const answer = data.answer || 'No response';
+
+                // Add assistant message
+                const assistantMsg = document.createElement('div');
+                assistantMsg.className = 'ai-message assistant';
+                assistantMsg.textContent = answer;
+                chatDiv.appendChild(assistantMsg);
+                chatDiv.scrollTop = chatDiv.scrollHeight;
+            } catch (error) {
+                const errMsg = document.createElement('div');
+                errMsg.className = 'ai-message assistant';
+                errMsg.textContent = '❌ ' + error.message;
+                chatDiv.appendChild(errMsg);
+                console.error('AI error:', error);
+            }
+        }
+
+        // Enter key to send AI message
+        document.getElementById('aiInput')?.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendAIMessage();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,93 @@
+# Python
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environments
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.venv
+
+# PyCharm/IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+*.iml
+.project
+.pydevproject
+
+# Django
+*.sqlite3
+db.sqlite3
+/staticfiles/
+/media/
+/sent_emails/
+*.log
+/htmlcov/
+.coverage
+.coverage.*
+*.cover
+
+# Celery
+celerybeat-schedule
+dump.rdb
+
+# Environment Variables
+.env
+.env.local
+.env.*.local
+.env.production
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*.swp
+*~
+
+# Misc
+*.bak
+*.tmp
+.cache/
+.pytest_cache/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+
+# Node (if using npm for frontend tools)
+node_modules/
+npm-debug.log*
+
+# Redis
+dump.rdb
+appendonly.aof
