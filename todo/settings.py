@@ -34,17 +34,51 @@ INSTALLED_APPS = [
 AUTH_USER_MODEL = 'users.User'
 
 
+# -------------------------------
+# Render / Production Settings
+# -------------------------------
+
+
+
+DEBUG = False  # если хочешь временно дебаг → ставь True
+
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    ".onrender.com",  # обязательно для Render
+]
+
+# -------------------------------
+# HTTPS / SECURITY
+# -------------------------------
+# На бесплатном Render НЕТ HTTPS → поэтому отключаем SSL-редирект
+
+SECURE_SSL_REDIRECT = False
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False
+
+SECURE_HSTS_SECONDS = 0
+SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+SECURE_HSTS_PRELOAD = False
+
+# -------------------------------
+# Django Rest Framework
+# -------------------------------
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    )
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ),
 }
 
+from datetime import timedelta
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "AUTH_HEADER_TYPES": ("Bearer",),
 }
+
+CORS_ALLOW_ALL_ORIGINS = True  
 
 
 MIDDLEWARE = [
